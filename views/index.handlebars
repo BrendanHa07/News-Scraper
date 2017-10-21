@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Scraped Articles</h2>
+        </div>
+    </div>
+
+    <!--articles go here-->
+    {{#each result}}
+    <div class="card news-section">
+        <a href="{{this.link}}">
+            <h4 class="card-header">{{this.title}}</h4>
+        </a>
+        <div class="card-block">
+            <p><a href="{{this.link}}"></a></p>
+            <br>
+
+            <a href="/articles/{{this._id}}" class="btn btn-primary">Add Comment</a>
+        </div>
+    </div>
+    {{/each}}
+ 
+  </div>
+</div>
+</div>
