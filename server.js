@@ -5,7 +5,7 @@ var cheerio = require("cheerio");
 var request = require("request");
 var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
-var Comment = require('./models/Comment.js');
+var Comments = require('./models/Comment.js');
 var Article = require('./models/Articles.js');
 
 // Initialize Express
