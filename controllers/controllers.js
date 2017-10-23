@@ -21,9 +21,14 @@ app.get('/scrape', function(req, res) {
         $('section.contentItem__content').each(function(i, element) {
             
             var title = $(this)
-                .children('a')
+                .children()
                 .text()
-                .trim();
+            // console.log("Title: " + title);
+            var summary = $(this)
+                .children()
+                .children('p')
+                .text()
+            // console.log("Summary: " + summary);
             var link = $(this)
                 .children('a')
                 .attr("href");
@@ -31,11 +36,13 @@ app.get('/scrape', function(req, res) {
             var result = {};
             
             result.title = title;
+            result.summary = summary;
             result.link = link;
 
             Article
                 .create(result)
                 .then(function(dbArticle) {
+                    console.log("Result: " + result)
                     console.log("Scrape complete!")
                     res.json(dbArticle)
                 })
@@ -50,11 +57,11 @@ app.get('/scrape', function(req, res) {
 // Route for getting all articles
 app.get('/articles', function(req, res) {
     Article
-        .find({}, function(err, doc) {
+        .find({}, function(err, dbArticle) {
             if (err) {
                 console.log(err)
             } else {
-                res.render('index', {result: doc});
+                res.render('index', {result: dbArticle});
             }
         })
         // will sort articles by most recent (descending order)
@@ -81,7 +88,7 @@ app.post('/articles/:id', function(req, res) {
     Comments
         .create(req.body)
         .then(function(dbComment) {
-            return Article.findOneAndUpdate({_id: req.params.id}, { $push: {comment: dbComment._id}}, {new: true})
+            return Article.findOneAndUpdate({_id: req.params.id}, { $push: {Comments: dbComment._id}}, {new: true})
         })
         .then(function(dbArticle) {
             res.json(dbArticle)

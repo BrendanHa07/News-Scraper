@@ -17,16 +17,22 @@
     <!--articles go here-->
     {{#each result}}
     <div class="card news-section">
-        <a href="{{this.link}}">
             <h4 class="card-header">{{this.title}}</h4>
         </a>
         <div class="card-block">
-            <p><a href="{{this.link}}"></a></p>
-            <br>
-
+            <div>
+                {{this.summary}}
+            </div>
+            <div>
+               <a href="http://espn.com/{{this.link}}"> Go to Article</a> 
+            </div>
             <a href="/articles/{{this._id}}" class="btn btn-primary">Comment</a>
         </div>
     </div>
     {{/each}}
  
+<br>
+<footer class="footer">
+        <p>&copy; Brendan Ha 2017</p>
+</footer>
 </div>
