@@ -27,7 +27,7 @@ app.set('view engine', 'handlebars');
 
 // Database configuration with mongoose
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/news-scraper", {
+mongoose.connect("mongodb://heroku_rs8vcgw8:en325p9a102jmpb8jlmlahk1eg@ds129315.mlab.com:29315/heroku_rs8vcgw8", {
   useMongoClient: true
 });
 
