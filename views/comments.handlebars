@@ -1,51 +1,53 @@
-<br>
 <div class="container">
+  <hr>
+  {{!--Display the scraped titles, links, and article snippets in this section.--}}
   <div class="row">
-      <h3>{{result.title}}</h3>
-      <h5>{{result.summary}}</h5>
-  </div>
-
-  <div class="row">
-    <h3>Comments So Far</h3>
+    <h1>{{result.title}}</h1>
   </div>
   <div class="row">
-      {{#unless result.Comments}}
-        <p>There are no comments. Add yours below!</p>
-      {{/unless}}
+    <h2>Comments So Far</h2>
+  </div>
+  {{!--If no comments exist then display the following ptag info--}}
+  <div class="row">
+    {{#unless result.comment}}
+    <p>There are no comments just yet. Add yours below!</p>
+    {{/unless}}
+  </div>
+  {{!--Iterate through the comments by author and their message, display them, and have the option to delete them from the user view (also deletes from our db --}}
+  <div class="row">
+    <ul>
+      {{#each result.comment}}
+      <li style="list-style: none">
+        <h5>Name: {{this.name}} </h5>
+        <p>Message: {{this.comment}}</p>
+        <button class="delete-button btn btn-secondary" data-comment="{{this._id}}">Delete Comment</button>
+      </li>
+      {{/each}}
+    </ul>
+    
   </div>
   <div class="row">
-       <ul>
-        {{#each result.Comments}}
-        <li>
-          <h5>Name: {{result.name}}</h5>
-          <p>Message: {{result.body}}></p>
-        </li>
-        {{/each}}
-        <button class="delete-button btn btn-primary" data-comment="{{this._id}}">Delete Comment</button>
-      </ul>
+    <h2>Say Something About This Article</h2>
   </div>
-   
-  
-
-  <div class="row">
-    <h2>Add a comment!</h2>
-  </div>
-  <form action="/articles/{{result._id}}">
+  {{!--Do a post method for the comment(s) a user adds and save it to the db--}}
+  <form method="POST" action="/articles/{{result._id}}">
     <div class="form-group row">
-        <label for="name" class="col-form-label">Name</label>
-        <input type="text" class="form-control" name="name" id="name" required>
+      <label for="name" class="col-form-label">Name</label>
+      <input class="form-control" type="text" name="name" id="name" required>
     </div>
     <div class="form-group row">
-        <label for="body">Comment</label>
-        <textarea class="form-control" name="body" id="body"  rows="3"></textarea>
+      <label for="body">Message</label>
+      <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
     </div>
-    <button class="btn btn-primary">Submit</button>
+    <button class="btn btn-primary" type="submit">Submit</button>
   </form>
-
+  <br>
   <br>
   <br>
   <br>
   <footer class="footer">
-        <p>&copy; Brendan Ha 2017</p>
+    <div class="container">
+      <p>&copy; Brendan Ha 2017</p>
+    </div>
   </footer>
 </div>

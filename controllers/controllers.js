@@ -1,78 +1,71 @@
 // dependencies
 var express = require('express');
 var app = express.Router();
-var path = require('path');
 var request = require('request');
 var cheerio = require('cheerio');
 var Comments = require('../models/Comment.js');
 var Article = require('../models/Articles.js');
-var axios = require('axios');
 
 // index route 
 app.get('/', function(req, res) {
-    res.render('index');
+    Article
+        .find({})
+        .then(function(dbArticle) {
+            res.render('index', {result: dbArticle});
+        })
+        .catch(function(err) {
+            res.json(err);
+        });
 });
 
 // scrape route
 app.get('/scrape', function(req, res) {
-    request('http://www.espn.com/', function(err,response, html) {
+    request('http://www.espn.com', function(error, response, html) {
         var $ = cheerio.load(html);
 
         $('section.contentItem__content').each(function(i, element) {
-            
-            var title = $(this)
-                .children()
-                .text()
-            // console.log("Title: " + title);
-            var summary = $(this)
-                .children()
-                .children('p')
-                .text()
-            // console.log("Summary: " + summary);
-            var link = $(this)
-                .children('a')
-                .attr("href");
 
+            var title = $(element).children().text();
+            var link = $(element).children('a').attr('href');
+    
             var result = {};
-            
+
             result.title = title;
-            result.summary = summary;
             result.link = link;
 
             Article
                 .create(result)
-                .then(function(dbArticle) {
-                    console.log("Result: " + result)
+                .then(function(dbArticle){
+                    // res.send(dbArticle);
+                    // console.log("Result: " + dbArticle)
                     console.log("Scrape complete!")
-                    res.json(dbArticle)
                 })
                 .catch(function(err) {
-                    res.json(err);
+                    res.json(err)
+                    // console.log(err)
                 });
         });
+        res.redirect('/articles');
     });
-    res.redirect('/articles');
 });
 
 // Route for getting all articles
 app.get('/articles', function(req, res) {
     Article
-        .find({}, function(err, dbArticle) {
-            if (err) {
-                console.log(err)
-            } else {
-                res.render('index', {result: dbArticle});
-            }
+        .find({})
+        .then(function(dbArticles) {
+            res.render('index', {result: dbArticles});
         })
-        // will sort articles by most recent (descending order)
-        .sort({'_id': -1})
+        .catch(function(err) {
+            res.json(err);
+        });
 });
 
 // Route for grabbing specific article with comment (ObjectId)
 app.get('/articles/:id', function(req, res) {
     Article
     .findOne({_id: req.params.id})
-    .populate("Comments")
+    .populate("comment")
     .then(function(dbArticle) {
         res.render("comments", {result: dbArticle});
     })
@@ -81,42 +74,45 @@ app.get('/articles/:id', function(req, res) {
     });
 });
 
-// route to create comment
-app.post('/articles/:id', function(req, res) {
-
-    var articleId = req.param.id
+ // Create a new comment
+ app.post("/articles/:id", function (req, res) {
+    // Create a new Comment and pass the req.body to the entry
     Comments
-        .create(req.body)
-        .then(function(dbComment) {
-            return Article.findOneAndUpdate({_id: req.params.id}, { $push: {Comments: dbComment._id}}, {new: true})
-        })
-        .then(function(dbArticle) {
-            res.json(dbArticle)
-        })
-        .catch(function(err) {
-            res.json(err)
-        })
-        res.redirect('/articles' + articleId);
-});
-
-// route for saving/updated an article's comment
-app.post('/articles/:id', function(req, res) {
-    Comments
-        .create(req.body)
-        .then(function(dbComments) {
-            return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComments._id}, {new: true});
-        })
-        .then(function(dbArticle) {
-            res.json(dbArticle);
-        })
-        .catch(function(err) {
-            res.json(err);
-        });
-});
+      .create(req.body, function (error, doc) {
+        // Log any errors
+        if (error) {
+          console.log(error// Otherwise
+          );
+        } else {
+          // Use the article id to find and update it's comment
+          Article.findOneAndUpdate({
+            "_id": req.params.id
+          }, {
+            $push: {
+              "comment": doc._id
+            }
+          }, {
+            safe: true,
+            upsert: true,
+            new: true
+          })
+          // Execute the above query
+            .exec(function (err, doc) {
+              // Log any errors
+              if (err) {
+                console.log(err);
+              } else {
+                // Or send the document to the browser
+                res.redirect('back');
+              }
+            });
+        }
+      });
+  });
 
 // route to delete comment
 app.delete("/articles/:id/:commentid", function (req, res) {
-    Comment
+    Comments
       .findByIdAndRemove(req.params.commentid, function (error, doc) {
         // Log any errors
         if (error) {
@@ -141,5 +137,6 @@ app.delete("/articles/:id/:commentid", function (req, res) {
         }
       });
   });
+
 
 module.exports = app;

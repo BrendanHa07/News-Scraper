@@ -1,8 +1,13 @@
 .title {
     text-align: center;
     color: white;
-    margin-top: 230px;
+    margin-top: 20px;
     font-family: 'Playfair Display SC', serif;
+}
+
+body {
+    font-family: 'PT Sans Narrow', sans-serif;
+    background-color: #486f8e;
 }
 
 .mongoTitle {
@@ -17,5 +22,6 @@
 
 .jumbotron {
     background-image: url('../images/2.jpg');
+    background-size: 100%;
 };
 

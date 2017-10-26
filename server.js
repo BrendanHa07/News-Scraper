@@ -7,15 +7,13 @@ var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 var Comments = require('./models/Comment.js');
 var Article = require('./models/Articles.js');
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongo-scraper";
+var PORT = process.env.PORT || 3030;
 
 // Initialize Express
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// Require models
-
-var PORT = process.env.PORT || 3030;
 
 // Set up a static folder (public) for our web app
 app.use(express.static("public"));
@@ -27,21 +25,12 @@ app.set('view engine', 'handlebars');
 
 // Database configuration with mongoose
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://heroku_rs8vcgw8:en325p9a102jmpb8jlmlahk1eg@ds129315.mlab.com:29315/heroku_rs8vcgw8", {
+
+mongoose.connect(MONGODB_URI, {
   useMongoClient: true
 });
 
-var db = mongoose.connection;
-
-// show mongoose errors
-db.on("error", function(error) {
-  console.log("Mongoose Error: ", error)
-});
-
-// log success message once in db
-db.once("open", function() {
-  console.log("Mongoose connection successful!");
-});
+process.on('unhandledRejection', up => { throw up })
 
 // import routes
 var routes = require('./controllers/controllers.js');

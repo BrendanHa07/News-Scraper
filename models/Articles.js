@@ -8,17 +8,11 @@ var ArticleSchema = new Schema({
     // title of article
     title: {
         type: String,
-        required: true,
-        unique: true
-    },
-    summary: {
-        type: String,
         unique: true
     },
     // link to article
     link: {
         type: String,
-        required: true,
         unique: true
     },
     
