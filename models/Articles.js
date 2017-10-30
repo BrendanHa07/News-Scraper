@@ -15,12 +15,12 @@ var ArticleSchema = new Schema({
         type: String,
         unique: true
     },
-    
     // create relationship with comment model
-    comment: {
+    comment: [ {
         type: Schema.Types.ObjectId,
         ref: "Comments"
     }
+    ]
 });
 
 // creates our model from the above schema

@@ -3,7 +3,6 @@
 <div class="jumbotron">
     <div class="title">
         <h1 class="mongoTitle">ESPN Scraper</h1>
-            <p>Let's go scrape some sports articles!</p>
             <p><a href="/scrape" class="btn btn-lg btn-danger">Scrape Away!</a></p>
     </div>
 </div><!--end of jumbotron-->
@@ -18,15 +17,13 @@
     <!--articles go here-->
     {{#each result}}
     <div class="card news-section">
-            <h4 class="card-header">{{this.title}}</h4>
         <div class="card-block">
             <div>
-                {{this.summary}}
+            <h4 class="card-header">{{this.title}}</h4>
+            <br>
+               <a href="http://espn.com/{{this.link}}" class="btn btn-primary "> Go to Article</a> 
+               <a href="/articles/{{this._id}}" class="btn btn-primary">Comment</a>
             </div>
-            <div>
-               <a href="http://espn.com/{{this.link}}"> Go to Article</a> 
-            </div>
-            <a href="/articles/{{this._id}}" class="btn btn-primary">Comment</a>
         </div>
     </div>
     <br>

@@ -5,10 +5,11 @@ var cheerio = require("cheerio");
 var request = require("request");
 var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
+var methodOverride = require("method-override");
 var Comments = require('./models/Comment.js');
 var Article = require('./models/Articles.js');
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongo-scraper";
-var PORT = process.env.PORT || 3030;
+var PORT = process.env.PORT || 8000;
 
 // Initialize Express
 var app = express();

@@ -1,13 +1,22 @@
 <div class="container">
   <hr>
   {{!--Display the scraped titles, links, and article snippets in this section.--}}
-  <div class="row">
-    <h1>{{result.title}}</h1>
-  </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h3>{{result.title}}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<br>
   <div class="row">
     <h2>Comments So Far</h2>
   </div>
   {{!--If no comments exist then display the following ptag info--}}
+  <hr>
   <div class="row">
     {{#unless result.comment}}
     <p>There are no comments just yet. Add yours below!</p>
@@ -18,9 +27,12 @@
     <ul>
       {{#each result.comment}}
       <li style="list-style: none">
-        <h5>Name: {{this.name}} </h5>
-        <p>Message: {{this.comment}}</p>
-        <button class="delete-button btn btn-secondary" data-comment="{{this._id}}">Delete Comment</button>
+        <h5>Name: {{name}} </h5>
+        <p>Message: {{comment}}</p>
+        <form action="comment/delete/{{this._id}}" method="delete">
+          <input type="hidden" name="deleted" value="true">
+          <button class="delete-button btn btn-secondary" data-id="{{this._id}}">Delete Comment</button>
+        </form>
       </li>
       {{/each}}
     </ul>
@@ -29,8 +41,7 @@
   <div class="row">
     <h2>Say Something About This Article</h2>
   </div>
-  {{!--Do a post method for the comment(s) a user adds and save it to the db--}}
-  <form method="POST" action="/articles/{{result._id}}">
+  <form method="POST" action="/comments/{{result._id}}">
     <div class="form-group row">
       <label for="name" class="col-form-label">Name</label>
       <input class="form-control" type="text" name="name" id="name" required>

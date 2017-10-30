@@ -10,6 +10,7 @@ var Article = require('../models/Articles.js');
 app.get('/', function(req, res) {
     Article
         .find({})
+        .sort({_id: -1})
         .then(function(dbArticle) {
             res.render('index', {result: dbArticle});
         })
@@ -38,10 +39,10 @@ app.get('/scrape', function(req, res) {
                 .then(function(dbArticle){
                     // res.send(dbArticle);
                     // console.log("Result: " + dbArticle)
-                    console.log("Scrape complete!")
+                    console.log("Article Added to the db!")
                 })
                 .catch(function(err) {
-                    res.json(err)
+                    // res.json(err)
                     // console.log(err)
                 });
         });
@@ -62,7 +63,7 @@ app.get('/articles', function(req, res) {
 });
 
 // Route for grabbing specific article with comment (ObjectId)
-app.get('/articles/:id', function(req, res) {
+app.get('/articles/:id/', function(req, res) {
     Article
     .findOne({_id: req.params.id})
     .populate("comment")
@@ -74,68 +75,46 @@ app.get('/articles/:id', function(req, res) {
     });
 });
 
- // Create a new comment
- app.post("/articles/:id", function (req, res) {
-    // Create a new Comment and pass the req.body to the entry
-    Comments
-      .create(req.body, function (error, doc) {
-        // Log any errors
-        if (error) {
-          console.log(error// Otherwise
-          );
-        } else {
-          // Use the article id to find and update it's comment
-          Article.findOneAndUpdate({
-            "_id": req.params.id
-          }, {
-            $push: {
-              "comment": doc._id
-            }
-          }, {
-            safe: true,
-            upsert: true,
-            new: true
-          })
-          // Execute the above query
-            .exec(function (err, doc) {
-              // Log any errors
-              if (err) {
-                console.log(err);
-              } else {
-                // Or send the document to the browser
-                res.redirect('back');
-              }
-            });
-        }
-      });
-  });
+
+// Create new comment
+app.post("/comments/:id", function(req, res) {
+  // Create a new note and pass the req.body to the entry
+  var articleId = req.params.id;
+  Comments
+    .create(req.body)
+    .then(function(dbComment) {
+      // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
+      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+      return Article.findOneAndUpdate({ _id: req.params.id }, {$push: { comment: dbComment._id }}, { new: true })
+      .populate('comment');
+    })
+    .then(function(dbArticle) {
+      // If we were able to successfully update an Article, send it back to the client
+    //   res.json(dbArticle);
+      console.log("Comment added to the db")
+    //   console.log(JSON.stringify(dbArticle));
+    })
+    .catch(function(err) {
+        res.json(err);
+        console.log("Error with posting!")
+    }); 
+    res.redirect('/articles/' + articleId);
+});
 
 // route to delete comment
-app.delete("/articles/:id/:commentid", function (req, res) {
+app.delete("/comment/delete/:comment_id", function (req, res) {
     Comments
-      .findByIdAndRemove(req.params.commentid, function (error, doc) {
-        // Log any errors
-        if (error) {
-          console.log(error// Otherwise
-          );
-        } else {
-          console.log(doc);
-          Article.findOneAndUpdate({
-            "_id": req.params.id
-          }, {
-            $pull: {
-              "Comments": doc._id
-            }
-          })
-          // Execute the above query
-            .exec(function (err, doc) {
-              // Log any errors
-              if (err) {
-                console.log(err);
-              }
-            });
-        }
-      });
+        .findOneAndRemove({_id: req.params.comment_id})
+        .then(function(dbcomment) {
+            res.json(dbComment);
+            console.log("Successfully deleted!")
+        })
+        .catch(function(err) {
+            res.json(err);
+            console.log("Error with deletion!")
+        });
+    
   });
 
 

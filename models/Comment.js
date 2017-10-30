@@ -8,15 +8,12 @@ var CommentSchema = new Schema({
     // author of comment
     name: {
         type: String,
-        required: true,
     },
     // comment body
-    comment: [
+    comment: 
         {
         type: String,
-        required: true,
         }
-    ]
 });
 
 // create the model
